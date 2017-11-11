@@ -1,18 +1,8 @@
 defmodule Fibz do
-  @moduledoc """
-  Documentation for Fibz.
-  """
+  use Application
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Fibz.hello
-      :world
-
-  """
-  def hello do
-    :world
+  @doc false
+  def start(_type, _args) do
+    Fibz.Supervisor.start_link()
   end
 end
