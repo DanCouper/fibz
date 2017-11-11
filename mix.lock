@@ -1,0 +1,5 @@
+%{
+  "bunt": {:hex, :bunt, "0.2.0", "951c6e801e8b1d2cbe58ebbd3e616a869061ddadcc4863d0a2182541acae9a38", [], [], "hexpm"},
+  "credo": {:git, "https://github.com/rrrene/credo.git", "cdd9ab40c72aa6e15a106fb8670516f1685346d1", []},
+  "stream_data": {:hex, :stream_data, "0.3.0", "cbfc8e3212f64683615657ea27804126a42ded634adfdfee258bf087ee605d46", [], [], "hexpm"},
+}
