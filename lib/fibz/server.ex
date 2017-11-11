@@ -62,7 +62,7 @@ defmodule Fibz.Server do
   def handle_call({:compute, int}, _from, cache) do
     case :ets.lookup(cache, int) do
       [] ->
-        computed_val = Fizzbuzz.parse_int(int)
+        computed_val = Fizzbuzz.slow_parse_int(int)
         :ets.insert(cache, {int, computed_val})
         {:reply, computed_val, cache}
 
