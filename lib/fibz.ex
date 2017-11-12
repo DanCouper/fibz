@@ -5,7 +5,10 @@ defmodule Fibz do
      the normal rules of fizzbuzz) - `Fibz.compute(int)`
 
   2. Sending a `:stop` cast message will cause `Fibz.Server` to exit normally;
-     this is triggered by `Fibz.stop_compute_server`.
+     this is triggered by `Fibz.stop`.
+     NOTE this would work without any kind of explicit function - simply
+     casting a `:stop` message to the server will automatically do that, this
+     just makes the API a little more explicit.
      FIXME `stop` has been used rather than `cast`
 
   3. `Fibz.Server` restarts automatically after crashing or receiving
@@ -17,9 +20,13 @@ defmodule Fibz do
      using `Process.sleep` to simulate computation - this makes it clear in the
      console when there is a cache hit or a cache miss.
 
-  5. TODO Fibz broadcasts its existence via :pg2, and you should be able to
-     demonstrate connecting remotely to the running application (from say the Elixir REPL)
-     and sending messages to the GenServer process.
+  5. Fibz broadcasts its existence via :pg2. A group with the same name as the server
+     is created on init, and any node connecting to the server node will be able to
+     join that group then run Fibz functions as normal.
+     NOTE no broadcasting functionality has been included, it simply allows access
+     to the functionality. A simple visual demonstartion of it working is to run
+     a compute function on a remote node, then run same again on either master or
+     a second remote node - the cache will be hit, the value will not be recomputed.
   """
 
   use Application
@@ -54,8 +61,8 @@ defmodule Fibz do
   ## Example
 
       iex> Application.start(Fibz, [])
-      ...> Fibz.stop_compute_server
+      ...> Fibz.stop
       :ok
   """
-  defdelegate stop_compute_server, to: Fibz.Server, as: :stop
+  defdelegate stop, to: Fibz.Server
 end
