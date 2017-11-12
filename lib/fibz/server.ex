@@ -1,6 +1,13 @@
 defmodule Fibz.Server do
   @moduledoc """
-  TODO fill me in
+  The core of the Fibz application. A GenServer whose main function,
+  `compute`, takes an integer and returns a computed value according
+  to the rules of Fizzbuzz.
+
+  Backed by an ETS table for caching.
+
+  Registers a process group for the module to allow easy access to
+  its functionality from remote nodes.
   """
 
   use GenServer
@@ -10,8 +17,16 @@ defmodule Fibz.Server do
   @fbserver __MODULE__
 
   @doc ~S"""
-  Initialise the actual Fizbuzz server. The state is an ETS table
-  used as a naïve caching mechanism.
+  Initialise the actual Fizbuzz server.
+
+  1. Initialises state as an ETS table used as a naïve caching mechanism.
+  2. Initilises and joins a process group with the same name as the module.
+
+  ## Example
+
+    iex> Fibz.Server.start_link([])
+    ...> :pg2.which_groups
+    [Fibz.Server]
   """
   def start_link(_arg) do
     GenServer.start_link(@fbserver, :ok, name: @fbserver)
@@ -55,6 +70,9 @@ defmodule Fibz.Server do
 
   @impl true
   def init(:ok) do
+    :pg2.create(@fbserver)
+    :pg2.join(@fbserver, self())
+
     {:ok, :ets.new(@fbserver, [])}
   end
 
