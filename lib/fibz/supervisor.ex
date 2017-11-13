@@ -10,7 +10,7 @@ defmodule Fibz.Supervisor do
 
   def init(:ok) do
     children = [
-      Fibz.Server
+      Fibz.FizzbuzzServer
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
