@@ -111,6 +111,10 @@ _I didn't know how pg2 worked prior to this_
 - [A Survival Guide on :pg2 Erlang Module](https://pdincau.wordpress.com/2012/01/12/a-survival-guide-on-pg2-erlang-module/)
 - [Elixirpalooza](https://gist.github.com/rozap/247e8cfce79d86f86d9dc200041ed022)
 
+and
+
+- [Property tested Haskell FizzBuzz implementation](https://github.com/jsl/fizz-buzz-hs/blob/master/FB.lhs)
+
 
 ## Installation
 
