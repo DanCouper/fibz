@@ -16,7 +16,7 @@ The module that handles the FizzBuzz computation, `Fibz.Fizbuzz`, wraps the main
 in a function that sleeps for a randomised number of milliseconds before returning - this makes it obvious
 when running the server what is a cache miss and what is a cache hit.
 
-Running `Fibz.stop/1` will stop the GenServer - as the restart is by default permanent, the server will
+Casting `:stop` to `Fibz.FizzbuzzServer.compute/1` will stop the GenServer - as the restart is by default permanent, the server will
 immediately restart - the only visible change will be that the cache has now been emptied.
 
 ```
@@ -24,13 +24,13 @@ $> iex -S mix
 ```
 
 ```
-iex> Fibz.compute 1
+iex> Fibz.FizzbuzzServer.compute 1
 1
-iex> Fibz.compute 3
+iex> Fibz.FizzbuzzServer.compute 3
 "fizz"
-iex> Fibz.compute 5
+iex> Fibz.FizzbuzzServer.compute 5
 "buzz"
-iex> Fibz.compute 15
+iex> Fibz.FizzbuzzServer.compute 15
 "fizzbuzz"
 ```
 
