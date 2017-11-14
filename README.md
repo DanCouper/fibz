@@ -41,37 +41,48 @@ iex> Fibz.FizzbuzzServer.compute 15
 In this terminal, start up the the Fibz application with a name:
 
 ```
-iex> iex --name fibz@127.0.0.1 --cookie monster -S mix
-iex(fibz@127.0.0.1)1> :pg2.which_groups
+iex> iex --name fibz1@127.0.0.1 --cookie monster -S mix
+iex(fibz1@127.0.0.1)1> :pg2.which_groups
 [Fibz.FizzbuzzServer]
-iex(fibz@127.0.0.1)2> :pg2.get_members Fibz.FizzbuzzServer
 ```
 
-The last should return a list with a single PID (_the Fizzbuzz server process_).
 **If I don't do this _after_ connecting a new node, the other nodes fail to see that the server process is part of the group. Why?**
 
 ### Terminal 2
 
+In this terminal, do same as above and connect:
+
+
+```
+iex> iex --name fibz2@127.0.0.1 --cookie monster -S mix
+iex(fibz2@127.0.0.1)1> Node.connect :"fibz1@127.0.0.1"
+true
+iex(fibz2@127.0.0.1)2> :pg2.get_members Fibz.FizzbuzzServer
+```
+
+This should give a list with two PIDs. May have to run something
+to "refresh" the `fibz1` terminal to pick up that they're in the same process group (_How to I avoid needing to do this?_).
+
+### Terminal 3
+
 Open a new terminal:
 
 ```
-$> iex --name one@127.0.0.1 --cookie monster
-
-iex(one@127.0.0.1)1> Node.connect :"fibz@127.0.0.1"
+$> iex --name client1@127.0.0.1 --cookie monster
+iex(client1@127.0.0.1)1> Node.connect :"fibz1@127.0.0.1"
 true
-iex(one@127.0.0.1)1> [pid] = :pg2.get_members Fibz.FizzbuzzServer
+iex(client1@127.0.0.1)2> :pg2.get_members Fibz.FizzbuzzServer
 ```
-
-There should only be one PID in the process group - last line will pattern match against that. Then
+_This won't immediately pick up any members - need to run again in one of the first terminals. Why?_
 
 ```
-iex(one@127.0.0.1)1> GenServer.call pid, {:compute, 1}
+iex(client1@127.0.0.1)3> GenServer.call(:pg2.get_closest_pid(Fibz.FizzbuzzServer), {:compute, 1})
 1
-iex(one@127.0.0.1)1> GenServer.call pid, {:compute, 1}
+iex(client1@127.0.0.1)4> GenServer.call(:pg2.get_closest_pid(Fibz.FizzbuzzServer), {:compute, 1})
 1
 ```
 
-In the first terminal, should see (note pid will be different):
+In the first & second terminals, should see (note pid will be different):
 
 ```
 "Value of '1' computed using Fibz' Fizzbuzz server via a call from node {#PID<15791.90.0>, #Reference<15791.4064742516.2291400709.230530>}"
@@ -81,23 +92,17 @@ In the first terminal, should see (note pid will be different):
 Then try:
 
 ```
-iex(one@127.0.0.1)1> GenServer.cast pid, :stop
-:ok
+iex(client1@127.0.0.1)5> GenServer.cast(:pg2.get_closest_pid(Fibz.FizzbuzzServer), :stop
+:ok)
 ```
 
-And in the first terminal, there should be the message:
+And in the first and second terminals, there should be the message:
 
 ```
 ":stop message cast to Fibz' Fizzbuzz server. Cache cleared down, server restarted."
 ```
 
-**NOW** the `pid` that was originally pattern matched against will be dead, and attempting to `call` against it will cause an error. This needs to
-be handled properly, but for now, just run this again, should be good to go (note may still need to fun the same thing on the server side as well
-so that everything links up properly):
-
-```
-iex(one@127.0.0.1)1> [pid] = :pg2.get_members Fibz.FizzbuzzServer
-```
+_Again, if further operations are then ran, need to do something in the first/second terminal otherwise it starts throwing errors. Why?_
 
 ## Future Reference
 

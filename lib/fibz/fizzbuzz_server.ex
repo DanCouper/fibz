@@ -91,15 +91,17 @@ defmodule Fibz.FizzbuzzServer do
 
   @impl true
   def handle_call({:compute, int}, from, cache) do
+    {source_pid, _ref} = from
+
     case :ets.lookup(cache, int) do
       [] ->
         computed_val = Fizzbuzz.slow_parse_int(int)
         :ets.insert(cache, {int, computed_val})
-        broadcast({from, "Value of '#{computed_val}' computed using Fibz' Fizzbuzz server via a call from node #{inspect from}"})
+        broadcast({from, "Value of '#{computed_val}' computed using Fibz' Fizzbuzz server via a call from node #{inspect source_pid}"})
         {:reply, computed_val, cache}
 
       [{_, v}] ->
-        broadcast({from, "Value of '#{v}' pulled from cache using Fibz' Fizzbuzz server via a call from node #{inspect from}"})
+        broadcast({from, "Value of '#{v}' pulled from cache using Fibz' Fizzbuzz server via a call from node #{inspect source_pid}"})
         {:reply, v, cache}
     end
   end
@@ -113,13 +115,13 @@ defmodule Fibz.FizzbuzzServer do
 
   @impl true
   def handle_info({:stop_server, message}, state) do
-    IO.inspect(message)
+    IO.puts(message)
     {:noreply, state}
   end
 
   @impl true
   def handle_info({_pid, message}, state) do
-    IO.inspect(message)
+    IO.puts(message)
     {:noreply, state}
   end
 end
